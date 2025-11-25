@@ -1,24 +1,10 @@
 use glob::glob;
-use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
-struct RawFigureData {
-    figure_id: Option<u16>,
-    variant_id: Option<u16>,
-    name: Option<String>,
-}
+use crate::common::{FigureData, INPUT_GLOB, OUTPUT_DIR, RawFigureData, UNIMPLEMENTED_PREFIX};
 
-#[derive(Serialize)]
-struct FigureData {
-    figure_id: u16,
-    variant_id: u16,
-    name: String,
-}
-
-/// Glob pattern for all input files
-const INPUT_GLOB: &str = "src/**/*.toml";
-/// Destination for built artifacts
-const OUTPUT_DIR: &str = "dist";
+mod common;
+mod json;
+mod rust;
 
 fn main() {
     // Clean output directory
@@ -31,25 +17,49 @@ fn main() {
         match entry {
             Err(e) => panic!("Error reading file: {:?}", e),
             Ok(path) => {
+                if path.starts_with(UNIMPLEMENTED_PREFIX) {
+                    println!("Skipping unimplemented file: {path:?}");
+                    continue;
+                }
+
                 println!("Processing file: {:?}", path);
 
                 // Parse TOML
                 let content = std::fs::read_to_string(&path).expect("Failed to read file content");
-                let data: RawFigureData = toml::from_str(&content).expect("Failed to parse TOML");
+                let data: RawFigureData = toml::from_str(&content).unwrap_or_else(|err| panic!("Failed to parse TOML. (path='{path:?}') {err}"));
+
+                let file_path = path.to_str().unwrap().to_string();
 
                 // Validate data
                 // - Ensure required fields are present
-                let figure_id = data.figure_id.expect("Missing figure_id");
-                let variant_id = data.variant_id.expect("Missing variant_id");
-                let name = data.name.expect("Missing name");
+                // let figure_id = data.figure_id.expect("Missing figure_id");
+                let figure_id = data.figure_id.unwrap_or_else(|| panic!("Missing required field 'figure_id': {file_path}"));
+                let variant_id = data.variant_id.unwrap_or_else(|| panic!("Missing required field 'variant_id': {file_path}"));
+                let name = data.name.unwrap_or_else(|| panic!("Missing required field 'name': {file_path}"));
                 // - Ensure all figure/variant ID combinations are unique
-                if all_figure_data
+                let duplicate_id_entry = all_figure_data
                     .iter()
-                    .any(|fig| fig.figure_id == figure_id && fig.variant_id == variant_id)
-                {
+                    .find(|fig| fig.figure_id == figure_id && fig.variant_id == variant_id);
+                if let Some(duplicate) = duplicate_id_entry {
                     panic!(
-                        "Duplicate `figure_id` and `variant_id` found: figure_id='{}', variant_id='{}'",
-                        figure_id, variant_id
+                        "Duplicate `figure_id` and `variant_id` found: (figure_id='{figure_id}') (variant_id='{variant_id}') (file_a='{}') (file_b='{}')",
+                        duplicate.file_path, file_path
+                    );
+                }
+
+                // Unique ID derived from `name`
+                let name_id = name
+                    .replace(' ', "_")
+                    .chars()
+                    .filter(|c| c.is_alphanumeric() || *c == '_')
+                    .collect::<String>()
+                    .to_lowercase();
+                // - Ensure all name IDs are unique
+                let duplicate_name_entry = all_figure_data.iter().find(|fig| fig.name_id == name_id);
+                if let Some(duplicate) = duplicate_name_entry {
+                    panic!(
+                        "Name '{name}' from file '{file_path}' is not unique enough to generate unique name_id. Both files produced unique name_id '{name_id}'. Duplicate: (name='{}') (path='{}')",
+                        duplicate.name, duplicate.file_path
                     );
                 }
 
@@ -57,6 +67,8 @@ fn main() {
                     figure_id,
                     variant_id,
                     name,
+                    name_id,
+                    file_path,
                 });
             }
         }
@@ -67,15 +79,9 @@ fn main() {
     std::fs::create_dir_all(OUTPUT_DIR).expect("Failed to create output directory");
 
     // Write artifacts
-    write_json(&all_figure_data);
+    json::emit(&all_figure_data);
+    rust::emit(&all_figure_data);
 }
 
-fn write_json(all_figure_data: &Vec<FigureData>) {
-    let out_file_name = format!("{}/figure_data.json", OUTPUT_DIR);
 
-    println!("Writing JSON artifact: '{out_file_name}'");
-    let mut file = std::fs::File::create(&out_file_name)
-        .unwrap_or_else(|_| panic!("Failed to create output file: {}", out_file_name));
 
-    serde_json::to_writer(&mut file, &all_figure_data).expect("Failed to write JSON data");
-}
