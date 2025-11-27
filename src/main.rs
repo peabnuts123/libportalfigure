@@ -6,6 +6,7 @@ mod common;
 mod javascript;
 mod json;
 mod rust;
+mod sqlite;
 
 fn main() {
     // Clean output directory
@@ -84,6 +85,7 @@ fn main() {
     javascript::emit(&all_figure_data);
     json::emit(&all_figure_data);
     rust::emit(&all_figure_data);
+    sqlite::emit(&all_figure_data);
 }
 
 
