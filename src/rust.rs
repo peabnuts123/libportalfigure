@@ -17,8 +17,10 @@ pub fn emit(all_figure_data: &Vec<FigureData>, version: &str) {
     // Cargo.toml
     let cargo_toml_content = format!(r#"[package]
 name = "portal_figure"
+description = "A code library of data relating to figures from the Skylanders series of video games."
 version = "{version}"
 edition = "2024"
+license = "CC0-1.0"
 
 [dependencies]
 "#);

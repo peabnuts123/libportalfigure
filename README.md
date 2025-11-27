@@ -81,3 +81,4 @@ Eventually this data will have a useful and accurate taxonomy of all data across
     - https://github.com/Texthead1/Custom-Mixed-Variant-Skylander-IDs
   - Set a license on this repo
   - Can we copy rustdoc from `FigureData` into emitted javascript, rust types?
+    - Can we centralise "description" fields somewhere

@@ -29,12 +29,13 @@ pub fn emit(all_figure_data: &Vec<FigureData>, version: &str) {
     // Cargo.toml
     let package_json_content = format!(r#"{{
   "name": "portal-figure",
+  "description": "A code library of data relating to figures from the Skylanders series of video games.",
   "version": "{version}",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "keywords": [],
   "author": "peabnuts123",
-  "license": "UNLICENSED",
+  "license": "CC0-1.0",
   "type": "commonjs"
 }}"#);
     std::fs::write(format!("{package_dir}/package.json"), package_json_content)
