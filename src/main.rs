@@ -3,6 +3,7 @@ use glob::glob;
 use crate::common::{FigureData, INPUT_GLOB, OUTPUT_DIR, RawFigureData, UNIMPLEMENTED_PREFIX};
 
 mod common;
+mod javascript;
 mod json;
 mod rust;
 
@@ -63,6 +64,7 @@ fn main() {
                     );
                 }
 
+                // @TODO version
                 all_figure_data.push(FigureData {
                     figure_id,
                     variant_id,
@@ -79,6 +81,7 @@ fn main() {
     std::fs::create_dir_all(OUTPUT_DIR).expect("Failed to create output directory");
 
     // Write artifacts
+    javascript::emit(&all_figure_data);
     json::emit(&all_figure_data);
     rust::emit(&all_figure_data);
 }

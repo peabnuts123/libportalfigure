@@ -13,6 +13,7 @@ pub struct RawFigureData {
 /// Parsed and validated figure data from a source file.
 /// Generally created from a `RawFigureData`.
 #[derive(Serialize)]
+// @TODO camel case for JSON
 pub struct FigureData {
     /// Figure ID (e.g. Spyro, Snap Shot, Trigger Happy, etc.)
     pub figure_id: u16,
