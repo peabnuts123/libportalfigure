@@ -2,8 +2,8 @@ use rusqlite::Connection;
 
 use crate::common::{FigureData, OUTPUT_DIR};
 
-pub fn emit(all_figure_data: &Vec<FigureData>) {
-    let out_file_name = format!("{}/portal-figure.db", OUTPUT_DIR);
+pub fn emit(all_figure_data: &Vec<FigureData>, version: &str) {
+    let out_file_name = format!("{}/portal-figure_v{version}.db", OUTPUT_DIR);
 
     println!("Writing SQLite artifact: '{out_file_name}'");
 
@@ -11,6 +11,7 @@ pub fn emit(all_figure_data: &Vec<FigureData>) {
         .unwrap_or_else(|_| panic!("Failed to create database file: '{}'", out_file_name));
 
     // Create table
+    // @TODO Should we store version somewhere in DB?
     conn.execute(
         "CREATE TABLE PortalFigure (
             figure_id INTEGER NOT NULL,

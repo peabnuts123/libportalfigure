@@ -1,6 +1,6 @@
 use crate::common::{FigureData, OUTPUT_DIR};
 
-pub fn emit(all_figure_data: &Vec<FigureData>) {
+pub fn emit(all_figure_data: &Vec<FigureData>, version: &str) {
     let package_dir = format!("{OUTPUT_DIR}/javascript");
     let src_dir = format!("{package_dir}/src");
 
@@ -27,16 +27,16 @@ pub fn emit(all_figure_data: &Vec<FigureData>) {
     };
 
     // Cargo.toml
-    let package_json_content = r#"{
+    let package_json_content = format!(r#"{{
   "name": "portal-figure",
-  "version": "0.1.0",
+  "version": "{version}",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "keywords": [],
   "author": "peabnuts123",
   "license": "UNLICENSED",
   "type": "commonjs"
-}"#;
+}}"#);
     std::fs::write(format!("{package_dir}/package.json"), package_json_content)
         .expect("Failed to write package.json");
 

@@ -1,6 +1,6 @@
 use crate::common::{FigureData, OUTPUT_DIR};
 
-pub fn emit(all_figure_data: &Vec<FigureData>) {
+pub fn emit(all_figure_data: &Vec<FigureData>, version: &str) {
     let crate_dir = format!("{OUTPUT_DIR}/rust");
     let src_dir = format!("{crate_dir}/src");
 
@@ -15,13 +15,13 @@ pub fn emit(all_figure_data: &Vec<FigureData>) {
         |figure_data: &FigureData| figure_data.name_id.to_uppercase();
 
     // Cargo.toml
-    let cargo_toml_content = r#"[package]
+    let cargo_toml_content = format!(r#"[package]
 name = "portal-figure"
-version = "0.1.0"
+version = "{version}"
 edition = "2024"
 
 [dependencies]
-"#;
+"#);
     std::fs::write(format!("{crate_dir}/Cargo.toml"), cargo_toml_content)
         .expect("Failed to write Cargo.toml");
 
