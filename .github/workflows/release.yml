@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Read VERSION
+        id: version
+        run: echo "VERSION=$(cat VERSION | tr -d '[:space:]')" >> $GITHUB_OUTPUT
+
+      - name: Build project
+        run: cargo build --release
+
+      - name: Run application to generate artifacts
+        run: cargo run --release
+
+      - name: Publish to npm
+        working-directory: dist/javascript
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to crates.io
+        working-directory: dist/rust
+        run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Create release archives
+        run: |
+          cd dist
+          zip -r portal-figure-javascript-v${{ steps.version.outputs.VERSION }}.zip javascript/
+          zip -r portal-figure-rust-v${{ steps.version.outputs.VERSION }}.zip rust/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: Release v${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist/portal-figure-javascript-v${{ steps.version.outputs.VERSION }}.zip
+            dist/portal-figure-rust-v${{ steps.version.outputs.VERSION }}.zip
+            dist/portal-figure_v${{ steps.version.outputs.VERSION }}.json
+            dist/portal-figure_v${{ steps.version.outputs.VERSION }}.db
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

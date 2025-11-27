@@ -1,0 +1,39 @@
+name: Check PR
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR code
+      - uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build project
+        run: cargo build
+
+      - name: Run application to generate artifacts
+        run: cargo run
+
+      # @TODO Run tests
+
+      - name: Fetch main branch VERSION
+        run: |
+          git fetch origin main:main
+          MAIN_VERSION=$(git show main:VERSION | tr -d '[:space:]')
+          PR_VERSION=$(cat VERSION | tr -d '[:space:]')
+          echo "Main branch version: $MAIN_VERSION"
+          echo "PR version: $PR_VERSION"
+
+          # Check if PR version is actually greater
+          if [ "$(printf '%s\n' "$MAIN_VERSION" "$PR_VERSION" | sort -V | tail -n1)" = "$MAIN_VERSION" ]; then
+            echo "❌ VERSION ($PR_VERSION) is not greater than main ($MAIN_VERSION)"
+            exit 1
+          fi
+
+          echo "✅ VERSION has been incremented from $MAIN_VERSION to $PR_VERSION"
