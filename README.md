@@ -82,3 +82,4 @@ Eventually this data will have a useful and accurate taxonomy of all data across
   - Set a license on this repo
   - Can we copy rustdoc from `FigureData` into emitted javascript, rust types?
     - Can we centralise "description" fields somewhere
+  - Emit a README in generated artifacts
