@@ -17,12 +17,12 @@ jobs:
       - name: Build project
         run: cargo build
 
-      - name: Run application to generate artifacts
+      - name: Run application
         run: cargo run
 
       # @TODO Run tests
 
-      - name: Fetch main branch VERSION
+      - name: Check VERSION is incremented
         run: |
           git fetch origin main:main
           MAIN_VERSION=$(git show main:VERSION | tr -d '[:space:]')
