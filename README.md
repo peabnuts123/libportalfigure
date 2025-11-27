@@ -76,6 +76,7 @@ Eventually this data will have a useful and accurate taxonomy of all data across
  - [Texthead1/Skylander-IDs](https://github.com/Texthead1/Skylander-IDs) - Cataloging Skylander figure and variant IDs. This represents the majority of the work in creating this library.
 
 ## Backlog
+  - C headers
   - Potentially more IDs
     - https://github.com/Texthead1/Custom-Mixed-Variant-Skylander-IDs
   - Set a license on this repo
