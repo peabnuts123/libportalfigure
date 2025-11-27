@@ -30,6 +30,12 @@ jobs:
       - name: Run application
         run: cargo run --release
 
+      - name: Create release archives
+        run: |
+          cd dist
+          zip -r portal-figure-javascript-v${{ steps.version.outputs.VERSION }}.zip javascript/
+          zip -r portal-figure-rust-v${{ steps.version.outputs.VERSION }}.zip rust/
+
       - name: Publish JavaScript artifact to npm
         working-directory: dist/javascript
         run: npm publish
@@ -39,12 +45,6 @@ jobs:
       - name: Publish Rust artifact to crates.io
         working-directory: dist/rust
         run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
-
-      - name: Create release archives
-        run: |
-          cd dist
-          zip -r portal-figure-javascript-v${{ steps.version.outputs.VERSION }}.zip javascript/
-          zip -r portal-figure-rust-v${{ steps.version.outputs.VERSION }}.zip rust/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
