@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write # Required for creating releases
+  id-token: write # Required for OIDC, npm
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -39,8 +43,6 @@ jobs:
       - name: Publish JavaScript artifact to npm
         working-directory: dist/javascript
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish Rust artifact to crates.io
         working-directory: dist/rust
@@ -62,5 +64,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-permissions:
-  contents: write
