@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: write # Required for creating releases
-  id-token: write # Required for OIDC, npm
+  id-token: write # Required for npm Trusted Publishing
 
 jobs:
   build-and-release:
@@ -23,6 +23,10 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+
+      # Ensure npm 11.5.1 or later is installed for Trusted Publishing
+      - name: Update npm
+        run: npm install -g npm@latest
 
       - name: Read VERSION
         id: version
