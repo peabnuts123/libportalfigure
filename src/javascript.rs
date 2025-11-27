@@ -37,7 +37,7 @@ pub fn emit(all_figure_data: &Vec<FigureData>, version: &str) {
   "keywords": [],
   "author": "peabnuts123",
   "license": "CC0-1.0",
-  "type": "commonjs"
+  "type": "module"
 }}"#
     );
     std::fs::write(format!("{package_dir}/package.json"), package_json_content)
