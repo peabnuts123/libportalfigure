@@ -16,7 +16,7 @@ pub fn emit(all_figure_data: &Vec<FigureData>, version: &str) {
 
     // Cargo.toml
     let cargo_toml_content = format!(r#"[package]
-name = "portal-figure"
+name = "portal_figure"
 version = "{version}"
 edition = "2024"
 
