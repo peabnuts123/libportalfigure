@@ -27,16 +27,16 @@ jobs:
       - name: Build project
         run: cargo build --release
 
-      - name: Run application to generate artifacts
+      - name: Run application
         run: cargo run --release
 
-      - name: Publish to npm
+      - name: Publish JavaScript artifact to npm
         working-directory: dist/javascript
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish to crates.io
+      - name: Publish Rust artifact to crates.io
         working-directory: dist/rust
         run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
@@ -61,3 +61,6 @@ jobs:
             dist/portal-figure_v${{ steps.version.outputs.VERSION }}.db
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  contents: write
