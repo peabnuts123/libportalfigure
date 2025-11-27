@@ -94,19 +94,20 @@ export function findFigure(figureId, variantId) {{
     );
     std::fs::write(format!("{}/index.js", src_dir), index_js_content).expect("Failed to write index.js");
 
+    let figure_type_name: &str = "PortalFigure";
     // TypeScript type definitions for individual named exports
     let specific_figure_dts = all_figure_data
         .iter()
         .map(|figure_data| {
             let export_name = figure_data_to_export_name(figure_data);
-            format!("export const {export_name}: Figure;")
+            format!("export const {export_name}: {figure_type_name};")
         })
         .collect::<Vec<String>>()
         .join("\n");
 
     // Source code for index.d.ts inside emitted JavaScript package artifact
     let index_dts_content = format!(
-        r#"export interface Figure {{
+        r#"export interface {figure_type_name} {{
   figureId: number;
   variantId: number;
   name: string;
@@ -114,9 +115,9 @@ export function findFigure(figureId, variantId) {{
 
 {specific_figure_dts}
 
-export const {exported_array_name}: readonly Figure[];
+export const {exported_array_name}: readonly {figure_type_name}[];
 
-export function findFigure(figureId: number, variantId: number): Figure | undefined;
+export function findFigure(figureId: number, variantId: number): {figure_type_name} | undefined;
 "#
     );
     std::fs::write(format!("{}/index.d.ts", src_dir), index_dts_content)
