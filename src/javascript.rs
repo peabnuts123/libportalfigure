@@ -27,17 +27,19 @@ pub fn emit(all_figure_data: &Vec<FigureData>, version: &str) {
     };
 
     // Cargo.toml
-    let package_json_content = format!(r#"{{
+    let package_json_content = format!(
+        r#"{{
   "name": "portal-figure",
-  "description": "A code library of data relating to figures from the Skylanders series of video games.",
+  "description": "A library of data relating to figures from the Skylanders series of video games.",
   "version": "{version}",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "keywords": [],
   "author": "peabnuts123",
   "license": "CC0-1.0",
-  "type": "commonjs"
-}}"#);
+  "type": "module"
+}}"#
+    );
     std::fs::write(format!("{package_dir}/package.json"), package_json_content)
         .expect("Failed to write package.json");
 
@@ -93,7 +95,8 @@ export function findFigure(figureId, variantId) {{
 }}
 "#
     );
-    std::fs::write(format!("{}/index.js", src_dir), index_js_content).expect("Failed to write index.js");
+    std::fs::write(format!("{}/index.js", src_dir), index_js_content)
+        .expect("Failed to write index.js");
 
     let figure_type_name: &str = "PortalFigure";
     // TypeScript type definitions for individual named exports
@@ -123,4 +126,41 @@ export function findFigure(figureId: number, variantId: number): {figure_type_na
     );
     std::fs::write(format!("{}/index.d.ts", src_dir), index_dts_content)
         .expect("Failed to write index.d.ts");
+
+    // README.md
+    let readme_content = r#"# portal-figure
+
+A library of data relating to figures from the Skylanders series of video games.
+
+This package is built from source: https://github.com/peabnuts123/libportalfigure
+
+## Installation
+
+```sh
+npm install portal-figure
+```
+
+## Usage
+
+```typescript
+import { Spyro, findFigure, type PortalFigure, PortalFigures } from 'portal-figure';
+
+// Use `findFigure()` to look up figure data by Figure ID + Variant ID
+const figure: PortalFigure = findFigure(0x1ce, 0x3000)!;
+console.log(`${figure.name} (figureId='0x${figure.figureId.toString(16)}') (variantId='0x${figure.variantId.toString(16)}')`);
+
+// Individually exported figure data
+console.log(`Spyro (figureId='0x${Spyro.figureId.toString(16)}') (variantId='0x${Spyro.variantId.toString(16)}')`);
+
+// `PortalFigures` is an array of all figures
+const allSpyros = PortalFigures.filter((figure) => figure.name.toLowerCase().includes("spyro"));
+
+console.log("All Spyro figures:");
+for (const figure of allSpyros) {
+  console.log(`${figure.name} (figureId='0x${figure.figureId.toString(16)}') (variantId='0x${figure.variantId.toString(16)}')`);
+}
+```
+"#;
+    std::fs::write(format!("{}/README.md", package_dir), readme_content)
+        .expect("Failed to write README.md");
 }

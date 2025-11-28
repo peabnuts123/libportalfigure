@@ -24,8 +24,8 @@ Code example:
 import { Spyro, findFigure, type PortalFigure } from 'portal-figure';
 
 const figure: PortalFigure = findFigure(0x1ce, 0x3000)!;
-console.log(`Spyro (figureId='${Spyro.figureId.toString(16)}') (variantId='${Spyro.variantId.toString(16)}')`);
-console.log(`${figure.name} (figureId='${figure.figureId.toString(16)}') (variantId='${Spyro.variantId.toString(16)}')`)
+console.log(`Spyro (figureId='0x${Spyro.figureId.toString(16)}') (variantId='0x${Spyro.variantId.toString(16)}')`);
+console.log(`${figure.name} (figureId='0x${figure.figureId.toString(16)}') (variantId='0x${figure.variantId.toString(16)}')`);
 ```
 
 ### Rust
@@ -39,7 +39,7 @@ cargo add portal_figure
 
 Code example:
 ```rust
-use portal_figure::{SPYRO, find_figure, PortalFigure};
+use portal_figure::{PortalFigure, SPYRO, find_figure};
 
 fn main() {
     let figure: &PortalFigure = find_figure(0x1ce, 0x3000).expect("Couldn't find figure");
@@ -82,4 +82,3 @@ Eventually this data will have a useful and accurate taxonomy of all data across
   - Set a license on this repo
   - Can we copy rustdoc from `FigureData` into emitted javascript, rust types?
     - Can we centralise "description" fields somewhere
-  - Emit a README in generated artifacts
